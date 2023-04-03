@@ -28,8 +28,8 @@ When `proto: grpc` is set, the ExtAuth service must implement the `Authorization
 ### The HTTP protocol
 
 External services for `proto: http` are often easier to implement, but have several limitations compared to `proto: grpc`.
- - The list of headers that the ExtAuth service is interested in reading must be known ahead of time, in order to set `allow_request_headers`.  Inspecting headers that are not known ahead of time requires instead using `proto: grpc`.
- - The list of headers that the ExtAuth service would like to set or modify must be known ahead of time, in order to set `allow_authorization_headers`.  Setting headers that are not known ahead of time requires instead using `proto: grpc`.
+ - The list of headers that the ExtAuth service is interested in reading must be known ahead of time, in order to set `allowed_request_headers`.  Inspecting headers that are not known ahead of time requires instead using `proto: grpc`.
+ - The list of headers that the ExtAuth service would like to set or modify must be known ahead of time, in order to set `allowed_authorization_headers`.  Setting headers that are not known ahead of time requires instead using `proto: grpc`.
  - When returning a direct HTTP response, the HTTP status code cannot be 200 or in the 5XX range.  Intercepting with a 200 or 5XX response requires instead using `proto: grpc`.
 
 #### The request From $productName$ to the ExtAuth service
@@ -72,9 +72,9 @@ Content-Length: 0
 
  - If the HTTP response returned from the ExtAuth service to $productName$ has an HTTP status code of 200, then the request is allowed through to the upstream backend service.  **Only** 200 indicates this; other 2XX status codes will prevent the request from being allowed through.
 
-   The 200 response should not contain anything in the body, but may contain arbitrary headers.  Any header present in the ExtAuth service' response that is also either listed in the `allow_authorization_headers` attribute of the AuthService resource or in the fixed list of headers that are always included will be copied from the ExtAuth service's response into the request going to the upstream backend service.  This allows the ExtAuth service to inject tokens or other information into the request, or to modify headers coming from the client.
+   The 200 response should not contain anything in the body, but may contain arbitrary headers.  Any header present in the ExtAuth service' response that is also either listed in the `allowed_authorization_headers` attribute of the AuthService resource or in the fixed list of headers that are always included will be copied from the ExtAuth service's response into the request going to the upstream backend service.  This allows the ExtAuth service to inject tokens or other information into the request, or to modify headers coming from the client.
 
-   The big limitation here is that the list of headers to be set must be known ahead of time, in order to set `allow_request_headers`.  Setting headers that are not known ahead of time requires instead using `proto: grpc`.
+   The big limitation here is that the list of headers to be set must be known ahead of time, in order to set `allowed_request_headers`.  Setting headers that are not known ahead of time requires instead using `proto: grpc`.
 
  - If $productName$ cannot reach the ExtAuth service at all, if the ExtAuth service does not return a valid HTTP response, or if the HTTP response has an HTTP status code in the 5XX range, then the communication with the ExtAuth service is considered to have failed, and the `status_on_error` or `failure_mode_allow` behavior is triggered.
 
